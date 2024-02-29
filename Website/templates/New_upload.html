@@ -1,0 +1,48 @@
+
+
+
+{% extends "base.html" %}
+
+{% block body %}
+
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 offset-md-3 mt-2">
+      <h2 class="text-center mb-2">Upload Video</h2>
+      <form method="post" class="row g-3 needs-validation" novalidate enctype="multipart/form-data">
+        <div class="mb-3">
+          <label for="videoFile" class="form-label">Select Video File:</label>
+          <input class="form-control" type="file" id="videoFile" name="videoFile" accept="video/*">
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% if send_url %}
+<div class="container mt-2">
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <h2 class="text-center mb-4">Processed Video</h2>
+      <!-- <h2 class="text-center mb-4">filename</h2> -->
+
+      <video controls  width="400" height="300">
+        <source src="{{ url_for('static', filename='uploads/processed_Convert_' + send_url) }}" type="video/mp4">
+
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+</div>
+
+{% endif %}
+
+<!-- Bootstrap JS Bundle (Bootstrap JS + Popper.js) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+     
+{% endblock %}

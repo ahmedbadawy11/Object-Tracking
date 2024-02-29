@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-8"> <!-- Adjust column width as per your preference -->
+            <h1 class="mb-4">Upload Video</h1>
+  
+            <!-- Card to contain both the file input and video display -->
+            <div class="card">
+                <div class="card-body">
+                    <!-- Video Upload Form -->
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="videoFile" class="form-label">Select Video File</label>
+                            <input type="file" class="form-control" id="videoFile" accept="video/*" required>
+                        </div>
+                    </form>
+                    {% if filename %}
+                    <!-- Uploaded Video Display -->
+                    <div id="videoDisplay" class="mt-4 d-none">
+                        <h3>Uploaded Video</h3>
+                        <video id="uploadedVideo" class="img-fluid" controls width="400" height="300", 
+                        src="{{ url_for('static',filename='uploads/'+filename) }}">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    
+
+                    {% endif %}
+
+                     <!-- Processed Video Display -->
+                    {% if processed_video_url %}
+                    <div id="processedVideoContainer" class="mt-4">
+                        <h3>Processed Video</h3>
+                        <video id="processedVideo" controls width="400" height="300">
+                            <source src="{{ processed_video_url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    {% endif %}
+  
+                    <!-- Uploaded Video Display -->
+                    <div id="videoDisplay" class="mt-4 d-none">
+                        <h3>Uploaded Video</h3>
+                        <video id="uploadedVideo" class="img-fluid" controls width="400" height="300">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    
+                    <!-- Processed Video Display -->
+                    <div id="processedVideoContainer" class="mt-4 d-none">
+                        <h3>Processed Video</h3>
+                        <video id="processedVideo" controls width="400" height="300">
+                            <source id="processedVideoSource" src="" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+
+                    <!-- Placeholder Image -->
+                    <img id="placeholderImage" class="img-fluid mb-3" src="https://via.placeholder.com/400x300" alt="Placeholder Image">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4"> <!-- Adjust column width as per your preference -->
+            <!-- Button to process and display the result -->
+            <button id="showResultBtn" class="btn btn-primary mt-3 float-md-end">Show Processed Video</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> <!-- Add Axios for making HTTP requests -->
+
+<script>
+// Function to handle file selection change
+document.getElementById('videoFile').addEventListener('change', function(event) {
+    var videoFileInput = event.target;
+
+    if (videoFileInput.files.length > 0) {
+        var videoDisplayDiv = document.getElementById('videoDisplay');
+        var uploadedVideo = document.getElementById('uploadedVideo');
+        var placeholderImage = document.getElementById('placeholderImage');
+
+        uploadedVideo.src = URL.createObjectURL(videoFileInput.files[0]);
+
+        videoDisplayDiv.classList.remove('d-none');
+        placeholderImage.style.display = 'none';
+    }
+});
+
+// Function to process and display the result
+document.getElementById('showResultBtn').addEventListener('click', function() {
+    var videoFile = document.getElementById('videoFile').files[0];
+    if (!videoFile) {
+        alert('Please upload a video file.');
+        return;
+    }
+
+    var formData = new FormData();
+    formData.append('video', videoFile);
+
+    // Send the uploaded video file to the backend for processing
+    axios.post('/process_video', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    
+    .catch(function(error) {
+        console.error('Error processing video:', error);
+        alert('Error processing video.');
+    });
+});
+</script>
+
+{% endblock %}
+
+<!-- 
+.then(function(response) {
+    // Display the processed video
+    var processedVideoUrl = response.data.processed_video_url;
+    var processedVideo = document.getElementById('processedVideo');
+    var processedVideoSource = document.getElementById('processedVideoSource');
+   
+    processedVideoSource.src = processedVideoUrl;
+    processedVideo.load();  // Reload the video element to load the new source
+    processedVideo.play();  // Play the video automatically
+    document.getElementById('processedVideoContainer').classList.remove('d-none');
+
+   // Display the processed video (You can implement this part)
+   alert('Processed video URL: ' + response.data.processed_video_url);
+}) -->
